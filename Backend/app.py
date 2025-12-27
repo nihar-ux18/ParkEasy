@@ -9,15 +9,21 @@ from bson import ObjectId
 import json
 
 app = Flask(__name__)
-app.config['JWT_SECRET_KEY'] = 'your-secret-key-change-this-in-production'
+app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY", "dev-secret")
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
 
 jwt = JWTManager(app)
 CORS(app)
 
 # MongoDB connection
-client = MongoClient('mongodb://localhost:27017/')
-db = client['parking_system']
+MONGODB_URI = os.getenv("MONGODB_URI")
+DATABASE_NAME = os.getenv("DATABASE_NAME", "parking_system")
+
+if not MONGODB_URI:
+    raise RuntimeError("MONGODB_URI environment variable not set")
+
+client = MongoClient(MONGODB_URI)
+db = client[DATABASE_NAME]
 
 # Collections
 users_collection = db['users']
@@ -520,4 +526,5 @@ def health_check():
 if __name__ == '__main__':
     initialize_data()
     app.run(debug=True, host='0.0.0.0', port=5000)
+
 
