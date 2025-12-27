@@ -198,6 +198,9 @@ def initialize_data():
                                 {'$set': {'status': 'available', 'booked_by': None}}
                             )
 
+# Initialize DB data on startup (works with gunicorn & local)
+initialize_data()
+
 # Authentication Routes
 @app.route('/api/auth/login', methods=['POST'])
 def login():
@@ -524,7 +527,7 @@ def health_check():
     return jsonify({'status': 'OK', 'message': 'Parking System API is running'}), 200
 
 if __name__ == '__main__':
-    initialize_data()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)
+
 
 
